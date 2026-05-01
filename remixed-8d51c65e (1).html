@@ -1,0 +1,356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>CC Training Checklist — OmniRaise</title>
+<style>
+  :root {
+    --navy: #0d1b3e;
+    --magenta: #d6006e;
+    --magenta-light: #ff2d87;
+    --white: #ffffff;
+    --off-white: #f7f7f9;
+    --gray-100: #f0f0f4;
+    --gray-200: #e2e2ea;
+    --gray-400: #9898aa;
+    --gray-600: #55556a;
+    --green: #00b57a;
+    --green-faint: rgba(0,181,122,0.10);
+    --radius: 14px;
+    --radius-sm: 10px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--off-white);
+    color: var(--navy);
+    min-height: 100vh;
+    padding-bottom: 80px;
+    font-size: 15px;
+  }
+
+  /* HEADER */
+  header {
+    background: var(--navy);
+    padding: 20px 16px 16px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: 0 2px 16px rgba(13,27,62,0.22);
+  }
+  .brand { font-size: 10px; font-weight: 700; letter-spacing: 0.14em; color: var(--magenta); text-transform: uppercase; margin-bottom: 4px; }
+  header h1 { font-size: 18px; font-weight: 800; color: var(--white); }
+  header p { font-size: 12px; color: rgba(255,255,255,0.45); margin-top: 2px; }
+
+  /* INFO BAR */
+  .info-bar { background: var(--white); border-bottom: 1px solid var(--gray-200); padding: 12px 16px; display: flex; flex-direction: column; gap: 10px; }
+  .fi-row { display: flex; align-items: center; gap: 10px; }
+  .fi-label { font-size: 10px; font-weight: 700; letter-spacing: 0.09em; text-transform: uppercase; color: var(--gray-400); white-space: nowrap; width: 80px; flex-shrink: 0; }
+  .fi-input {
+    font-family: inherit; font-size: 14px; font-weight: 500;
+    border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm);
+    padding: 9px 12px; color: var(--navy); background: var(--off-white);
+    outline: none; flex: 1; width: 100%;
+    -webkit-appearance: none;
+  }
+  .fi-input:focus { border-color: var(--magenta); }
+
+  /* PROGRESS */
+  .prog-wrap { padding: 16px 16px 0; }
+  .prog-meta { display: flex; justify-content: space-between; margin-bottom: 8px; }
+  .prog-label { font-size: 11px; font-weight: 700; color: var(--gray-600); text-transform: uppercase; letter-spacing: 0.07em; }
+  .prog-count { font-size: 13px; font-weight: 700; color: var(--magenta); font-variant-numeric: tabular-nums; }
+  .prog-track { height: 7px; background: var(--gray-200); border-radius: 99px; overflow: hidden; }
+  .prog-fill { height: 100%; background: linear-gradient(90deg, var(--magenta), var(--magenta-light)); border-radius: 99px; transition: width 0.4s cubic-bezier(0.34,1.56,0.64,1); width: 0%; }
+
+  /* COMPLETE BANNER */
+  .complete-banner { display: none; margin: 14px 16px 0; }
+  .complete-banner.show { display: block; }
+  .banner-inner { background: linear-gradient(135deg, #0d1b3e, #1a3070); border-radius: var(--radius); padding: 18px 20px; text-align: center; color: #fff; }
+  .banner-emoji { font-size: 30px; margin-bottom: 6px; }
+  .banner-title { font-size: 15px; font-weight: 800; }
+  .banner-sub { font-size: 11px; color: rgba(255,255,255,0.55); margin-top: 3px; }
+
+  /* SECTIONS */
+  .sections { padding: 14px 16px; display: flex; flex-direction: column; gap: 12px; }
+  .section {
+    background: var(--white); border-radius: var(--radius);
+    overflow: hidden; box-shadow: 0 1px 4px rgba(13,27,62,0.07);
+    border: 1.5px solid var(--gray-200); transition: border-color 0.3s;
+  }
+  .section.all-done { border-color: var(--green); }
+
+  .sec-header {
+    display: flex; align-items: center; gap: 12px; padding: 14px 14px;
+    cursor: pointer; -webkit-tap-highlight-color: rgba(0,0,0,0.04);
+    border-bottom: 1px solid transparent; min-height: 60px;
+  }
+  .section.open .sec-header { border-bottom-color: var(--gray-100); }
+
+  .sec-icon { width: 40px; height: 40px; border-radius: 11px; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; }
+  .sec-title-wrap { flex: 1; min-width: 0; }
+  .sec-title { font-size: 14px; font-weight: 800; color: var(--navy); }
+  .sec-sub { font-size: 11px; color: var(--gray-400); margin-top: 2px; line-height: 1.3; }
+
+  .sec-badge { font-size: 11px; font-weight: 700; padding: 4px 9px; border-radius: 99px; background: var(--gray-100); color: var(--gray-600); white-space: nowrap; font-variant-numeric: tabular-nums; transition: all 0.3s; }
+  .section.all-done .sec-badge { background: var(--green-faint); color: var(--green); }
+
+  .chevron { color: var(--gray-400); font-size: 13px; margin-left: 4px; transition: transform 0.25s; flex-shrink: 0; }
+  .section.open .chevron { transform: rotate(180deg); }
+
+  /* ITEMS */
+  .sec-body { display: none; flex-direction: column; padding: 8px 10px 12px; gap: 2px; }
+  .section.open .sec-body { display: flex; }
+
+  .item {
+    display: flex; align-items: flex-start; gap: 12px;
+    padding: 12px 10px; border-radius: var(--radius-sm);
+    cursor: pointer; min-height: 52px; transition: background 0.15s;
+    -webkit-tap-highlight-color: rgba(0,0,0,0.04);
+  }
+  .item:active { background: var(--off-white); }
+  .item.checked { background: var(--green-faint); }
+
+  .checkbox {
+    width: 24px; height: 24px; border-radius: 7px; border: 2px solid var(--gray-200);
+    flex-shrink: 0; margin-top: 1px; display: flex; align-items: center; justify-content: center;
+    transition: all 0.2s; background: var(--white);
+  }
+  .item.checked .checkbox { background: var(--green); border-color: var(--green); }
+  .checkmark { display: none; color: white; font-size: 14px; font-weight: 800; }
+  .item.checked .checkmark { display: block; }
+
+  .item-text { flex: 1; }
+  .item-label { font-size: 13.5px; font-weight: 600; color: var(--navy); line-height: 1.35; transition: color 0.2s; }
+  .item.checked .item-label { color: var(--gray-400); text-decoration: line-through; text-decoration-color: var(--gray-200); }
+  .item-note { font-size: 11.5px; color: var(--gray-400); margin-top: 3px; line-height: 1.4; font-style: italic; }
+
+  /* SIGNOFF */
+  .signoff { padding: 0 16px 16px; }
+  .signoff-card { background: var(--white); border-radius: var(--radius); padding: 18px; border: 1.5px solid var(--gray-200); }
+  .signoff-title { font-size: 10px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; color: var(--gray-400); margin-bottom: 14px; }
+  .sig-field { margin-bottom: 12px; }
+  .sig-label { font-size: 10px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; color: var(--gray-400); margin-bottom: 5px; }
+  .sig-input {
+    font-family: inherit; font-size: 14px; width: 100%;
+    border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm);
+    padding: 10px 12px; color: var(--navy); background: var(--off-white);
+    outline: none; -webkit-appearance: none;
+  }
+  .sig-input:focus { border-color: var(--magenta); }
+
+  /* SAVE BUTTON */
+  .btn-save {
+    width: 100%; margin-top: 6px;
+    background: var(--navy); color: var(--white);
+    border: none; border-radius: var(--radius-sm);
+    padding: 15px; font-family: inherit; font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: background 0.2s, transform 0.1s;
+    -webkit-appearance: none;
+  }
+  .btn-save:active { transform: scale(0.97); }
+  .btn-save.ready { background: var(--magenta); }
+
+  /* DOWNLOAD INSTRUCTION BOX */
+  .dl-box { background: #fff8e6; border: 1.5px solid #f5c842; border-radius: var(--radius-sm); padding: 12px 14px; margin: 14px 16px 0; }
+  .dl-box p { font-size: 12px; line-height: 1.6; color: #7a5c00; }
+  .dl-box strong { font-weight: 700; color: #5a4000; }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">OmniRaise · Field Training</div>
+  <h1>CC Training Checklist</h1>
+  <p>TL → Fundraiser · Complete all sections before sign-off</p>
+</header>
+
+<div class="dl-box">
+  <p>📲 <strong>To use offline:</strong> Open in browser → tap Share → <strong>"Add to Home Screen"</strong> (iPhone) or <strong>"Install App"</strong> (Android). Works without internet!</p>
+</div>
+
+<div class="info-bar">
+  <div class="fi-row">
+    <span class="fi-label">Fundraiser</span>
+    <input class="fi-input" id="fundraiserName" placeholder="Full name" />
+  </div>
+  <div class="fi-row">
+    <span class="fi-label">TL / Manager</span>
+    <input class="fi-input" id="tlName" placeholder="Full name" />
+  </div>
+  <div class="fi-row">
+    <span class="fi-label">Date</span>
+    <input class="fi-input" id="dateField" type="date" />
+  </div>
+</div>
+
+<div class="prog-wrap">
+  <div class="prog-meta">
+    <span class="prog-label">Progress</span>
+    <span class="prog-count" id="progressCount">0 / 0</span>
+  </div>
+  <div class="prog-track"><div class="prog-fill" id="progressFill"></div></div>
+</div>
+
+<div class="complete-banner" id="completeBanner">
+  <div class="banner-inner">
+    <div class="banner-emoji">🎉</div>
+    <div class="banner-title">All sections complete!</div>
+    <div class="banner-sub">Sign off below and share with your manager.</div>
+  </div>
+</div>
+
+<div class="sections" id="sections"></div>
+
+<div class="signoff">
+  <div class="signoff-card">
+    <div class="signoff-title">Sign-Off</div>
+    <div class="sig-field">
+      <div class="sig-label">TL confirms training complete</div>
+      <input class="sig-input" placeholder="TL initials / name" />
+    </div>
+    <div class="sig-field">
+      <div class="sig-label">Fundraiser acknowledges training received</div>
+      <input class="sig-input" placeholder="Fundraiser initials / name" />
+    </div>
+    <div class="sig-field">
+      <div class="sig-label">Notes / Follow-up actions</div>
+      <input class="sig-input" placeholder="Any areas to revisit..." />
+    </div>
+    <button class="btn-save" id="saveBtn" onclick="window.print()">📋 Save / Print Checklist</button>
+  </div>
+</div>
+
+<script>
+const SECTIONS = [
+  {
+    id:"mindset", icon:"🧠", color:"#fff0f7",
+    title:"Mindset & Belief", sub:"Build genuine belief before technique",
+    items:[
+      {l:"Fundraiser can explain why CC donors matter to the charity", n:"Not just revenue — donor lifetime value, direct debit reliability, cause impact"},
+      {l:"Fundraiser understands how CC signups affect their commission", n:"Walk through the numbers — what's the difference per CC vs cash signup?"},
+      {l:"Fundraiser understands how CC performance affects progression", n:"Link it clearly to their career path at OmniRaise"},
+      {l:"Fundraiser has had at least one micro-win acknowledged by TL", n:"Build from real moments — 'You stopped that donor — that's exactly the profile we want'"},
+      {l:"Fundraiser can state their personal CC goal for today's shift", n:"Specific and owned — not assigned, agreed"},
+    ]
+  },
+  {
+    id:"profiling", icon:"👁️", color:"#f0f4ff",
+    title:"Donor Profiling", sub:"Identify high-probability CC donors before approaching",
+    items:[
+      {l:"Fundraiser knows the primary demographic signals to look for", n:"Age 40+, business attire, grooming, branded bags / accessories"},
+      {l:"Fundraiser understands the recycling bag / eco-bag signal", n:"Eco-conscious donors often skew higher income — a soft but real indicator"},
+      {l:"Fundraiser is aware of cultural context (Malaysian market)", n:"Chinese donors statistically more likely to have CC — prioritise stops respectfully"},
+      {l:"Fundraiser can do the wallet check technique", n:"Trained to notice an open wallet moment — said with confidence, not apology"},
+      {l:"Fundraiser can describe 3+ profiling signals in their own words", n:"Test: ask them to talk you through how they'd scan a crowd"},
+    ]
+  },
+  {
+    id:"approach", icon:"🎯", color:"#f0fff8",
+    title:"Approach & Stop", sub:"CC donors are competitive to stop — approach must be sharp",
+    items:[
+      {l:"Fundraiser's opening hook is strong enough to stop a busy high-value donor", n:"Weak openers = walk-past. Role-play and drill until it's natural"},
+      {l:"Fundraiser can open and deliver a full pitch in English", n:"Many CC donors prefer English — fundraiser must not default to Malay only"},
+      {l:"Fundraiser understands multiple fundraisers compete for the same CC-profile donors", n:"Speed, energy, and positioning matter — who gets there first with the best stop wins"},
+      {l:"TL has doubled up on at least one CC-profile donor approach", n:"Live observation — not just role-play. TL to give real-time feedback after."},
+      {l:"Fundraiser has attempted to stop at least one CC-profile donor this shift", n:"Micro-goal: one Chinese donor / one 40+ well-dressed donor attempted today"},
+    ]
+  },
+  {
+    id:"pitch", icon:"💬", color:"#fff8f0",
+    title:"Pitch & Assumed Close", sub:"The CC ask must feel natural, not bolted on",
+    items:[
+      {l:"Fundraiser naturally assumes CC in their close — not cash-first", n:"'Most of our supporters set this up on their card' — make CC the default"},
+      {l:"Fundraiser can deliver a full CC pitch without prompting", n:"From intro → charity story → impact → assumed CC close. Should feel smooth."},
+      {l:"Fundraiser uses evidence folder (EF) effectively during pitch", n:"Photos, testimonials, impact data — shown at the right moment to build trust"},
+      {l:"Fundraiser does not backpedal to cash when donor hesitates", n:"Hesitation ≠ no. Train them to hold the ask before offering an alternative"},
+      {l:"TL has reviewed and approved fundraiser's full CC pitch", n:"Sign off only once you've heard it start to finish — not just the close"},
+    ]
+  },
+  {
+    id:"objections", icon:"🛡️", color:"#f5f0ff",
+    title:"Objection Handling", sub:"Two main objections — both need a trained response",
+    items:[
+      {l:"Fundraiser has a confident rebuttal for: 'I don't have a credit card'", n:"'Are you sure? Even a debit card linked to Visa or Mastercard would work' — then wallet check"},
+      {l:"Fundraiser has a confident rebuttal for: 'I don't want to use my card'", n:"Acknowledge → reframe → reassure. One objection is not a close."},
+      {l:"Fundraiser does not give up after the first objection", n:"Train the pause. Train the second attempt."},
+      {l:"TL has role-played both objections with fundraiser", n:"Switch roles — let them handle you objecting. Observe body language, not just words."},
+    ]
+  },
+  {
+    id:"self", icon:"⭐", color:"#fffff0",
+    title:"Personal Strengths & Presentation", sub:"Polish and self-awareness",
+    items:[
+      {l:"TL has identified this fundraiser's natural strength in CC conversations", n:"Warmth? Confidence? Language? Build the CC ask around what they already do well."},
+      {l:"Fundraiser meets dress code standard for CC-focus shifts", n:"High-value donors respond to presentation. Check before shift starts."},
+      {l:"Fundraiser knows which donor profiles they connect with best", n:"Self-awareness → better profiling decisions on the floor"},
+      {l:"Fundraiser has been praised for one specific CC-related behaviour this week", n:"Strength-based coaching — name it. Repeat it."},
+    ]
+  }
+];
+
+function build() {
+  const c = document.getElementById('sections');
+  SECTIONS.forEach((sec, si) => {
+    const el = document.createElement('div');
+    el.className = 'section' + (si === 0 ? ' open' : '');
+    el.id = 'sec-' + sec.id;
+    const total = sec.items.length;
+    el.innerHTML = `
+      <div class="sec-header" onclick="toggle('${sec.id}')">
+        <div class="sec-icon" style="background:${sec.color}">${sec.icon}</div>
+        <div class="sec-title-wrap">
+          <div class="sec-title">${sec.title}</div>
+          <div class="sec-sub">${sec.sub}</div>
+        </div>
+        <span class="sec-badge" id="badge-${sec.id}">0/${total}</span>
+        <span class="chevron">▾</span>
+      </div>
+      <div class="sec-body">
+        ${sec.items.map((it, ii) => `
+          <div class="item" id="item-${sec.id}-${ii}" onclick="check('${sec.id}',${ii})">
+            <div class="checkbox"><span class="checkmark">✓</span></div>
+            <div class="item-text">
+              <div class="item-label">${it.l}</div>
+              <div class="item-note">${it.n}</div>
+            </div>
+          </div>`).join('')}
+      </div>`;
+    c.appendChild(el);
+  });
+  updateAll();
+}
+
+function toggle(id) {
+  document.getElementById('sec-' + id).classList.toggle('open');
+}
+
+function check(secId, idx) {
+  document.getElementById(`item-${secId}-${idx}`).classList.toggle('checked');
+  updateAll();
+}
+
+function updateAll() {
+  let total = 0, checked = 0;
+  SECTIONS.forEach(sec => {
+    const items = document.querySelectorAll(`#sec-${sec.id} .item`);
+    const done = document.querySelectorAll(`#sec-${sec.id} .item.checked`).length;
+    total += items.length; checked += done;
+    document.getElementById('badge-' + sec.id).textContent = `${done}/${items.length}`;
+    document.getElementById('sec-' + sec.id).classList.toggle('all-done', done === items.length);
+  });
+  document.getElementById('progressCount').textContent = `${checked} / ${total}`;
+  document.getElementById('progressFill').style.width = total ? (checked/total*100)+'%' : '0%';
+  const done = checked === total && total > 0;
+  document.getElementById('completeBanner').classList.toggle('show', done);
+  const btn = document.getElementById('saveBtn');
+  btn.classList.toggle('ready', done);
+  btn.textContent = done ? '✅ All Done — Save / Print' : '📋 Save / Print Checklist';
+}
+
+document.getElementById('dateField').valueAsDate = new Date();
+build();
+</script>
+</body>
+</html>
